@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// schema.prisma
+
+// Category Model
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+  href String
+  // Relationships
+  subcategories SubCategory[]
+}
+
+// Product Model
+model Product {
+  id              Int          @id @default(autoincrement())
+  name            String
+  url             String
+  image           String       @default("N/A")
+  brand           String       @default("N/A")
+  delivery        String       @default("N/A")
+  price           String       @default("N/A")
+  availability    String       @default("N/A")
+  subcategoryId   Int
+  // Relationships
+  subcategory     SubCategory  @relation(fields: [subcategoryId], references: [id])
+  specifications  Specification[]
+}
+
+model Specification {
+  id        Int     @id @default(autoincrement())
+  key       String
+  value     String
+  productId Int
+  // Relationship
+  product   Product @relation(fields: [productId], references: [id])
+}
+// SubCategory Model
+model SubCategory {
+  id         Int     @id @default(autoincrement())
+  name       String
+  href       String
+  categoryId Int
+  // Relationships
+  category   Category @relation(fields: [categoryId], references: [id])
+  products   Product[]
+}
+
+// This is needed if you want to store the specifications as JSON in SQLite
+// In Prisma, Json type is mapped to JSON in SQLite
+// You may need to adjust this based on your specific requirements or database constraints.
+// If you need more fine-grained control, you might want to consider using a separate table for specifications.
+
+// Note: The `@relation` directive is used to define relationships between models.
